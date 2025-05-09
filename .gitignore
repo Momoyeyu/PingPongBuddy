@@ -1,0 +1,5 @@
+# local enviroment PATH
+.env
+
+# jetbrain IDE
+.idea
