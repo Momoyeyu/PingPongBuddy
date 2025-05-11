@@ -33,9 +33,22 @@ cp .env.example .env
 
 ## 安装依赖
 
+### 安装基本依赖
+
 ```bash
 pip install -r requirements.txt
 ```
+
+### 开发模式安装
+
+为避免导入路径问题，建议使用开发模式安装：
+
+```bash
+# 在项目根目录执行
+pip install -e .
+```
+
+这将以可编辑模式安装项目，任何修改会直接生效，且不会有导入路径问题。
 
 ## 运行应用
 
@@ -84,7 +97,7 @@ API 服务将在配置的地址上启动，支持以下端点：
 import requests
 
 # 查询智能体能力描述
-response = requests.get("http://localhost:8000/agent_spec.json")
+response = requests.get("http://localhost:8555/agent_spec.json")
 print(response.json())
 
 # 使用约球匹配服务
@@ -92,7 +105,7 @@ data = {
     "time": "2023-09-15 14:00",
     "place": "北京邮电大学体育馆"
 }
-response = requests.post("http://localhost:8000/api/v1/match", json=data)
+response = requests.post("http://localhost:8555/api/v1/match", json=data)
 print(response.json())
 ```
 
@@ -129,5 +142,23 @@ API_PORT=8555 docker-compose up -d
 
 查看智能体能力描述：
 ```bash
-curl http://localhost:8000/agent_spec.json
-``` 
+curl http://localhost:8555/agent_spec.json
+```
+
+## 常见问题
+
+### ModuleNotFoundError: No module named 'pingpongbuddy'
+
+如果遇到此错误，表示 Python 无法找到 pingpongbuddy 模块。解决方法：
+
+1. 使用开发模式安装项目：
+   ```bash
+   pip install -e .
+   ```
+
+2. 或手动添加项目路径到 PYTHONPATH：
+   ```bash
+   export PYTHONPATH=$PYTHONPATH:/path/to/PingPongBuddy
+   ```
+
+3. 如果使用 Docker，请确保 Docker 镜像正确配置了 Python 路径。 

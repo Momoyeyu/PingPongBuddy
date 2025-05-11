@@ -4,6 +4,13 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 import json
 import os
+import sys
+
+# 添加项目根目录到 Python 路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from pingpongbuddy.agents import PingPongAgent
 
@@ -151,4 +158,4 @@ async def health_check():
 # 本地运行
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("pingpongbuddy.api:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("pingpongbuddy.api:app", host="0.0.0.0", port=8555, reload=True) 

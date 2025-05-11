@@ -4,8 +4,13 @@
 """
 
 import os
+import sys
 import argparse
 from dotenv import load_dotenv
+
+# 将当前目录添加到 Python 路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
 
 def main():
     # 加载环境变量
@@ -13,7 +18,7 @@ def main():
     
     # 从环境变量获取 API 服务配置
     default_host = os.getenv("API_HOST", "0.0.0.0")
-    default_port = int(os.getenv("API_PORT", "8000"))
+    default_port = int(os.getenv("API_PORT", "8555"))
     
     # 解析命令行参数
     parser = argparse.ArgumentParser(description="友小智 - PingPongBuddy")
