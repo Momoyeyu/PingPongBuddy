@@ -1,0 +1,49 @@
+{
+  "places": [
+    {
+      "id": 1,
+      "name": "北京邮电大学体育馆",
+      "address": "北京市海淀区西土城路10号",
+      "tables": 8,
+      "open_time": "09:00",
+      "close_time": "22:00",
+      "price_per_hour": 30
+    },
+    {
+      "id": 2,
+      "name": "清华大学综合体育馆",
+      "address": "北京市海淀区清华园1号",
+      "tables": 12,
+      "open_time": "08:00",
+      "close_time": "21:30",
+      "price_per_hour": 40
+    },
+    {
+      "id": 3,
+      "name": "中国乒乓球学院",
+      "address": "北京市朝阳区安定路5号",
+      "tables": 24,
+      "open_time": "08:30",
+      "close_time": "21:00",
+      "price_per_hour": 50
+    },
+    {
+      "id": 4,
+      "name": "上海体育学院乒乓球中心",
+      "address": "上海市杨浦区长海路399号",
+      "tables": 16,
+      "open_time": "09:00",
+      "close_time": "22:00",
+      "price_per_hour": 35
+    },
+    {
+      "id": 5,
+      "name": "广州体育馆",
+      "address": "广州市越秀区连新路176号",
+      "tables": 10,
+      "open_time": "10:00",
+      "close_time": "20:00",
+      "price_per_hour": 25
+    }
+  ]
+} 

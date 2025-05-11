@@ -3,3 +3,6 @@
 
 # jetbrain IDE
 .idea
+
+# cache
+__pycache__/

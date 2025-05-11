@@ -1,0 +1,8 @@
+# Agent
+langchain
+langchain-openai
+langchain-core
+psycopg2
+psycopg2-binary
+streamlit
+python-dotenv
