@@ -26,6 +26,11 @@ cp .env.example .env
 
 2. 编辑`.env`文件，填入你的智谱API密钥和数据库配置
 
+主要环境变量：
+- 数据库配置：`DB_NAME`、`DB_USER`、`DB_PASSWORD`、`DB_HOST`、`DB_PORT`
+- 智谱AI配置：`OPENAI_API_KEY`
+- API服务配置：`API_HOST`、`API_PORT`（默认为 0.0.0.0:8555）
+
 ## 安装依赖
 
 ```bash
@@ -48,10 +53,26 @@ python run.py --mode frontend
 支持符合 ACS（Agent Capability Specification）协议的 API 模式：
 
 ```bash
-python run.py --mode api --host 0.0.0.0 --port 8000
+# 使用默认配置 (从环境变量读取 API_HOST 和 API_PORT 或使用默认值 0.0.0.0:8555)
+python run.py --mode api
 ```
 
-API 服务将在 http://localhost:8000 上启动，支持以下端点：
+也可以指定主机和端口：
+```bash
+python run.py --mode api --host 127.0.0.1 --port 8555
+```
+
+或者通过环境变量配置：
+```bash
+# 在 .env 文件中配置
+API_HOST=127.0.0.1
+API_PORT=8555
+
+# 然后运行
+python run.py --mode api
+```
+
+API 服务将在配置的地址上启动，支持以下端点：
 
 - `GET /agent_spec.json` - 获取符合 ACS 协议的智能体能力描述
 - `POST /api/v1/match` - 乒乓球约球匹配服务
@@ -78,6 +99,11 @@ print(response.json())
 ### 使用Docker
 ```bash
 docker-compose up -d
+```
+
+可以在 docker-compose.yml 文件中或通过环境变量设置 API 服务的端口：
+```bash
+API_PORT=8555 docker-compose up -d
 ```
 
 ## 功能特点

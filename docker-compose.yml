@@ -53,8 +53,10 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - API_HOST=0.0.0.0
+      - API_PORT=8555
     ports:
-      - "8000:8000"
+      - "8555:8555"
     command: python run.py --mode api
     depends_on:
       - db

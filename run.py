@@ -8,19 +8,23 @@ import argparse
 from dotenv import load_dotenv
 
 def main():
+    # 加载环境变量
+    load_dotenv()
+    
+    # 从环境变量获取 API 服务配置
+    default_host = os.getenv("API_HOST", "0.0.0.0")
+    default_port = int(os.getenv("API_PORT", "8000"))
+    
     # 解析命令行参数
     parser = argparse.ArgumentParser(description="友小智 - PingPongBuddy")
     parser.add_argument('--mode', type=str, default='frontend',
                         choices=['frontend', 'api', 'test'],
                         help='运行模式: frontend(前端界面), api(API服务), test(运行测试)')
-    parser.add_argument('--host', type=str, default='0.0.0.0',
-                        help='API服务主机地址')
-    parser.add_argument('--port', type=int, default=8000,
-                        help='API服务端口')
+    parser.add_argument('--host', type=str, default=default_host,
+                        help=f'API服务主机地址 (默认: {default_host}, 可通过环境变量 API_HOST 设置)')
+    parser.add_argument('--port', type=int, default=default_port,
+                        help=f'API服务端口 (默认: {default_port}, 可通过环境变量 API_PORT 设置)')
     args = parser.parse_args()
-    
-    # 加载环境变量
-    load_dotenv()
     
     if args.mode == 'frontend':
         # 运行Streamlit前端
