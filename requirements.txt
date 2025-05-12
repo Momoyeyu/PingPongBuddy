@@ -2,7 +2,7 @@
 langchain
 langchain-openai
 langchain-core
-psycopg2
+# psycopg2  # You might encounter with some problems when installing this dependency on ubuntu. In this case, you could only install the binary one (below)
 psycopg2-binary
 streamlit
 python-dotenv
