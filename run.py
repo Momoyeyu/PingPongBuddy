@@ -19,7 +19,7 @@ def main():
     # 从环境变量获取 API 服务配置
     default_host = os.getenv("API_HOST", "0.0.0.0")
     default_port = int(os.getenv("API_PORT", "8555"))
-    
+
     # 解析命令行参数
     parser = argparse.ArgumentParser(description="友小智 - PingPongBuddy")
     parser.add_argument('--mode', type=str, default='frontend',

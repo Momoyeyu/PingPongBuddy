@@ -41,6 +41,7 @@ for message in st.session_state.messages:
 with st.sidebar:
     st.header("约球信息")
     
+    # 基本信息
     today = datetime.date.today()
     date = st.date_input("选择日期", today + datetime.timedelta(days=1))
     
@@ -50,16 +51,78 @@ with st.sidebar:
     
     place = st.text_input("场地", "")
     
+    # 高级选项（可折叠）
+    show_advanced = st.checkbox("显示高级选项")
+    
+    skill_level = None
+    opponent_count = None
+    opponent_skill_level = None
+    match_type = None
+    additional_notes = None
+    
+    if show_advanced:
+        with st.expander("高级约球选项", expanded=True):
+            skill_level = st.selectbox(
+                "我的技术水平", 
+                options=["", "初级", "中级", "高级", "专业"],
+                index=0
+            )
+            
+            opponent_count = st.selectbox(
+                "希望找几位球友", 
+                options=["", "1", "2", "3", "4", "不限"],
+                index=0
+            )
+            
+            opponent_skill_level = st.selectbox(
+                "希望球友的技术水平", 
+                options=["", "不限", "初级", "中级", "高级", "专业"],
+                index=0
+            )
+            
+            match_type = st.selectbox(
+                "比赛类型", 
+                options=["", "友谊赛", "训练", "正式比赛", "教学"],
+                index=0
+            )
+            
+            additional_notes = st.text_area("备注", "", height=100)
+    
     if st.button("发起约球", disabled=not place):
-        # 添加用户消息
-        user_message = f"我想在 {datetime_str} 在 {place} 打乒乓球，请帮我找球友"
+        # 构建用户消息
+        user_message = f"我想在 {datetime_str} 在 {place} 打乒乓球"
+        
+        # 收集提供的高级选项
+        advanced_options = []
+        if skill_level:
+            advanced_options.append(f"我的技术水平是{skill_level}")
+        if opponent_count:
+            advanced_options.append(f"希望找{opponent_count}个球友")
+        if opponent_skill_level:
+            advanced_options.append(f"对手技术水平在{opponent_skill_level}左右")
+        if match_type:
+            advanced_options.append(f"比赛类型为{match_type}")
+        if additional_notes:
+            advanced_options.append(f"备注：{additional_notes}")
+        
+        # 添加高级选项到消息
+        if advanced_options:
+            user_message += "，" + "，".join(advanced_options)
+            
+        # 添加到会话记录
         st.session_state.messages.append({"role": "user", "content": user_message})
         
         # 获取智能体回复
         with st.spinner("正在寻找球友..."):
             response = st.session_state.agent.invoke(
+                input_text=user_message,
                 time=datetime_str,
-                place=place
+                place=place,
+                skill_level=skill_level,
+                opponent_count=opponent_count,
+                opponent_skill_level=opponent_skill_level,
+                match_type=match_type,
+                additional_notes=additional_notes
             )
         
         # 添加助手消息
@@ -79,10 +142,8 @@ if prompt := st.chat_input("和友小智聊聊..."):
     
     # 显示助手消息
     with st.chat_message("assistant"):
-        response = st.session_state.agent.invoke(
-            time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-            place="默认场地"
-        )
+        # 直接使用用户输入的文本调用智能体
+        response = st.session_state.agent.invoke(input_text=prompt)
         st.write(response)
     
     # 添加助手消息到历史

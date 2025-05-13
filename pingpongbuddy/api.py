@@ -35,8 +35,14 @@ agent = PingPongAgent()
 
 # 请求模型
 class MatchRequest(BaseModel):
-    time: str
-    place: str
+    input_text: str = None
+    time: str = None
+    place: str = None
+    skill_level: str = None
+    opponent_count: str = None
+    opponent_skill_level: str = None
+    match_type: str = None
+    additional_notes: str = None
 
 # ACS 模型
 class ProviderInfo(BaseModel):
@@ -89,7 +95,7 @@ async def get_agent_spec():
     acs = {
         "AIC": "01001560001000625000000000000147",  # 示例 AIC
         "name": "PingPongBuddy",
-        "description": "乒乓球约球智能助手，支持乒乓球友约球和球友匹配",
+        "description": "乒乓球约球智能助手，支持乒乓球友约球、球友匹配和相关查询",
         "url": "https://pingpongbuddy.example.com",
         "version": "1.0.0",
         "registrationTime": "2023-08-15T08:30:00+08:00",
@@ -105,16 +111,24 @@ async def get_agent_spec():
             {
                 "id": "match:01",
                 "name": "乒乓球约球",
-                "description": "根据用户提供的时间和地点，进行乒乓球约球匹配",
-                "tags": ["乒乓球", "约球", "匹配"],
+                "description": "提供乒乓球约球服务，可以接受自然语言或结构化输入，支持约球、查询和一般性问题回答",
+                "tags": ["乒乓球", "约球", "匹配", "查询"],
                 "version": "1.0.0",
                 "lastModifiedTime": datetime.now(timezone.utc).isoformat().replace('+00:00', '+08:00'),
-                "inputTypes": ["application/json"],
+                "inputTypes": ["application/json", "text/plain"],
                 "outputTypes": ["application/json", "text/plain"],
                 "examples": [
                     {
-                        "input": '{"time": "2023-09-15 14:00", "place": "北京邮电大学体育馆"}',
-                        "output": "我已收到你的约球请求，将为你匹配2023年9月15日14:00在北京邮电大学体育馆打乒乓球的球友"
+                        "input": '{"input_text": "我想明天下午两点在北邮体育馆打乒乓球"}',
+                        "output": "我已收到你的约球请求，将为你匹配明天下午两点在北邮体育馆打乒乓球的球友。"
+                    },
+                    {
+                        "input": '{"time": "2023-09-15 14:00", "place": "北京邮电大学体育馆", "skill_level": "中级"}',
+                        "output": "我已收到你的约球请求，将为你匹配2023年9月15日14:00在北京邮电大学体育馆打乒乓球的球友。你的技术水平是中级，我会寻找适合的球友。"
+                    },
+                    {
+                        "input": '{"input_text": "查询今天有哪些约球信息"}',
+                        "output": "今天有3条约球信息：1. 14:00在北邮体育馆有2人约球，2. 16:30在清华大学体育馆有1人约球，3. 19:00在北邮体育馆有4人约球。"
                     }
                 ],
                 "SDKs": [
@@ -133,9 +147,16 @@ async def get_agent_spec():
 @app.post("/api/v1/match")
 async def match(request: MatchRequest):
     try:
+        # 直接转发所有参数（包括可选参数）到智能体
         response = agent.invoke(
+            input_text=request.input_text,
             time=request.time,
-            place=request.place
+            place=request.place,
+            skill_level=request.skill_level,
+            opponent_count=request.opponent_count,
+            opponent_skill_level=request.opponent_skill_level,
+            match_type=request.match_type,
+            additional_notes=request.additional_notes
         )
         
         return {
