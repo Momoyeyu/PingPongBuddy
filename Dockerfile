@@ -1,7 +1,7 @@
 FROM harbor.lab.bigai.site/junjie-su/pingpongbuddy:latest
 
 # 复制项目文件
-COPY . .
+COPY scripts .
 
 # 暴露端口
 EXPOSE 8501

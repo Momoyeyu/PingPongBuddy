@@ -27,7 +27,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: pingpongbuddy/docker/Dockerfile
+      dockerfile: Dockerfile
     environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
@@ -45,7 +45,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: pingpongbuddy/docker/Dockerfile
+      dockerfile: Dockerfile
     environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}

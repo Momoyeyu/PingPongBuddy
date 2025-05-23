@@ -111,12 +111,12 @@ print(response.json())
 
 ### 使用Docker
 ```bash
-docker-compose up -d
+scripts-compose up -d
 ```
 
 可以在 docker-compose.yml 文件中或通过环境变量设置 API 服务的端口：
 ```bash
-API_PORT=8555 docker-compose up -d
+API_PORT=8555 scripts-compose up -d
 ```
 
 ## 功能特点
