@@ -1,4 +1,4 @@
-FROM harbor.lab.bigai.site/junjie-su/pingpongbuddy:latest
+FROM harbor.lab.bigai.site/momoyeyu/pingpongbuddy:latest
 
 # 复制项目文件
 COPY scripts .
