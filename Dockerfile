@@ -1,10 +1,13 @@
 FROM harbor.lab.bigai.site/momoyeyu/pingpongbuddy:latest
 
+WORKDIR /app
+
 # 复制项目文件
-COPY scripts .
+COPY . .
+
+# 设置权限
+RUN chmod -R 755 /app
 
 # 暴露端口
 EXPOSE 8501
-
-# 启动应用
-ENTRYPOINT ["streamlit", "run", "pingpongbuddy/frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+EXPOSE 8555
