@@ -6,9 +6,15 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from collections import defaultdict
 
+# 导入统一的日志模块
+from pingpongbuddy.logs.logger import get_logger
+
+# 初始化日志
+logger = get_logger('pingpongbuddy.agent')
 
 class PingPongAgent:
     def __init__(self, model_name="glm-4-flash", api_base="https://open.bigmodel.cn/api/paas/v4"):
+        logger.info(f"Initializing PingPongAgent with model: {model_name}")
         self.model = ChatOpenAI(
             model=model_name,
             openai_api_base=api_base,
@@ -31,7 +37,20 @@ class PingPongAgent:
                     "3. 如果用户询问其他问题：\n"
                     "   - 提供乒乓球相关的专业回答\n"
                     "   - 对于非乒乓球问题，简单友好地回应\n\n"
-                    "请根据用户输入的内容，判断他们的意图并提供相应服务。"
+                    "数据库操作指南：\n"
+                    "1. 添加新用户：\n"
+                    "   - 使用 pingpong_db_tool 工具，action 设为 'add_user'\n"
+                    "   - 参数：{\"username\": 用户名, \"contact\": 联系方式(可选)}\n"
+                    "   - 返回：用户ID (user_id)\n\n"
+                    "2. 存储约球请求：\n"
+                    "   - 使用 pingpong_db_tool 工具，action 设为 'store_request'\n"
+                    "   - 参数：{\"user_id\": 用户ID, \"time\": 时间, \"place\": 地点}\n"
+                    "   - 返回：请求ID (request_id)\n\n"
+                    "3. 查找匹配的球友：\n"
+                    "   - 使用 pingpong_db_tool 工具，action 设为 'find_matches'\n"
+                    "   - 参数：{\"time\": 时间, \"place\": 地点}\n"
+                    "   - 返回：匹配的球友列表\n\n"
+                    "请根据用户输入的内容，判断他们的意图并提供相应服务。对于约球和查询请求，必须使用上述数据库工具进行操作。"
                 )),
                 ("human", "{history}\n\n{input}")
             ]
@@ -70,23 +89,18 @@ class PingPongAgent:
         return self.parser_model.invoke(message.format(text=output.content))
 
     def invoke(self, input_text=None, time=None, place=None, **optional_params):
-        """
-        调用智能体处理用户请求
-
-        Args:
-            input_text: 用户输入的文本，如直接对话内容
-            time: 时间，如"2025-05-10 14:00"（如果由表单提供）
-            place: 地点，如"北京邮电大学体育馆"（如果由表单提供）
-            optional_params: 其他可选参数，如技术水平、球友数量等
-
-        Returns:
-            智能体输出的回复内容
-        """
+        """调用智能体处理用户请求"""
+        logger.info(f"Agent invoked with input_text: {input_text}, time: {time}, place: {place}")
+        
         # 如果提供了结构化输入（时间和地点），构建约球请求文本
         if time and place:
             # 构建基本约球请求
             request_text = f"我想在{time}在{place}打乒乓球"
-
+            
+            # 记录可选参数
+            if optional_params:
+                logger.debug(f"Optional parameters: {optional_params}")
+                
             # 添加可选信息（如果提供）
             if optional_params:
                 additional_info = []
@@ -115,4 +129,7 @@ class PingPongAgent:
             {"input": input_text},
             config={"configurable": {"session_id": "default"}}  # Provide a session_id
         )
+        
+        # 记录最终响应
+        logger.info(f"Agent response generated successfully")
         return response.content

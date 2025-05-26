@@ -1,8 +1,15 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import os
+from datetime import datetime
+
+# 导入统一的日志模块
+from pingpongbuddy.logs.logger import get_logger
 
 class PingPongDatabase:
     def __init__(self, dbname, user, password, host="localhost", port="5432"):
+        self.logger = get_logger('pingpongbuddy.db')
+        self.logger.info(f"Initializing database connection to {dbname} on {host}:{port}")
         self.dbname = dbname
         self.conn_params = {"dbname": dbname, "user": user, "password": password, "host": host, "port": port}
         self.default_conn_params = {"dbname": "postgres", "user": user, "password": password, "host": host, "port": port}
@@ -11,27 +18,34 @@ class PingPongDatabase:
 
     def _create_database(self):
         try:
+            self.logger.debug(f"Attempting to create database {self.dbname} if not exists")
             conn = psycopg2.connect(**self.default_conn_params)
             conn.autocommit = True
             cursor = conn.cursor()
             cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s", (self.dbname,))
             if not cursor.fetchone():
+                self.logger.info(f"Creating database {self.dbname}")
                 cursor.execute(f"CREATE DATABASE {self.dbname}")
             cursor.close()
             conn.close()
         except Exception as e:
+            self.logger.error(f"Error creating database: {e}")
             raise Exception(f"Error creating database: {e}")
 
     def connect(self):
         try:
+            self.logger.debug("Connecting to database")
             self._create_database()
             self.conn = psycopg2.connect(**self.conn_params)
             self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
             self._create_table()
+            self.logger.info("Database connection established successfully")
         except Exception as e:
+            self.logger.error(f"Database connection error: {e}")
             raise Exception(f"Database connection error: {e}")
 
     def _create_table(self):
+        self.logger.debug("Creating tables if not exist")
         create_tables_query = """
         CREATE TABLE IF NOT EXISTS users (
             user_id SERIAL PRIMARY KEY,
@@ -90,8 +104,10 @@ class PingPongDatabase:
         """
         self.cursor.execute(create_tables_query)
         self.conn.commit()
+        self.logger.info("Tables created or verified successfully")
     
     def store_request(self, user_id, time, place):
+        self.logger.info(f"Storing request for user_id={user_id}, time={time}, place={place}")
         insert_query = """
         INSERT INTO pingpong_requests (user_id, time, place, status)
         VALUES (%s, %s, %s, 'open')
@@ -99,9 +115,12 @@ class PingPongDatabase:
         """
         self.cursor.execute(insert_query, (user_id, time, place))
         self.conn.commit()
-        return self.cursor.fetchone()['request_id']
+        request_id = self.cursor.fetchone()['request_id']
+        self.logger.debug(f"Request stored with ID: {request_id}")
+        return request_id
 
     def find_matches(self, time, place):
+        self.logger.info(f"Finding matches for time={time}, place={place}")
         select_query = """
         SELECT
             r.request_id,
@@ -121,9 +140,12 @@ class PingPongDatabase:
         ORDER BY time_distance ASC;
         """
         self.cursor.execute(select_query, (time, place))
-        return self.cursor.fetchall()
+        matches = self.cursor.fetchall()
+        self.logger.debug(f"Found {len(matches)} matches")
+        return matches
 
     def add_user(self, username, contact=None):
+        self.logger.info(f"Adding user: username={username}, contact={contact}")
         insert_query = """
         INSERT INTO users (username, contact)
         VALUES (%s, %s)
@@ -131,10 +153,14 @@ class PingPongDatabase:
         """
         self.cursor.execute(insert_query, (username, contact))
         self.conn.commit()
-        return self.cursor.fetchone()['user_id']
+        user_id = self.cursor.fetchone()['user_id']
+        self.logger.debug(f"User added with ID: {user_id}")
+        return user_id
 
     def close(self):
+        self.logger.debug("Closing database connection")
         if self.cursor:
             self.cursor.close()
         if self.conn:
-            self.conn.close() 
+            self.conn.close()
+        self.logger.info("Database connection closed")
